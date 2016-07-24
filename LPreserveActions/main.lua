@@ -9,6 +9,8 @@ local UTILS = {
     for i, v in ipairs(T) do
       count = count + 1
     end
+
+    print("TableSize:", count);
     return count;
   end
 };
@@ -22,7 +24,7 @@ local SpellCache = {
 local _config = {
   --["bars"] = {2,3,4,5},
   ["initialized"] = false,
-  ["store"] = {}
+  ["store"] = nil
 };
 
 function println(...)
@@ -58,16 +60,9 @@ end
 
 function LPA:saveState()
   -- Reset Store
-  table.wipe(_config.store);
+  _config.store = {}
 
   -- Save Actions
-  local result, err = pcall(function()
-
-  end);
-  if ( result == false ) then
-    error(err);
-  end
-
   self:_iterateSlots(function(store, actionId)
     store[actionId] = nil;
 
@@ -93,7 +88,7 @@ function LPA:saveState()
 end
 
 function LPA:restoreState()
-  if ( UTILS:TableSize(_config.store) == 0 ) then return end;
+  if ( _config.store == nil ) then return end;
 
   -- Init
   ClearCursor();
@@ -219,6 +214,6 @@ _frame:SetScript("OnEvent", function(self, event, ...)
   elseif ( event == "UNIT_SPELLCAST_START" and arg[5] == 200749 ) then
     -- println("Changing specialization, save action bars ...");
     LPA:saveState()
-    
+
   end
 end)
