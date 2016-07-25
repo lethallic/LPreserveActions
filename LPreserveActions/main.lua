@@ -1,4 +1,6 @@
 local _addonName = "LPA";
+local DEBUG = false;
+
 -- local _player, _realm = UnitName("player");
 
 -- local MAX_MACROS = MAX_CHARACTER_MACROS + MAX_ACCOUNT_MACROS
@@ -24,7 +26,7 @@ local SpellCache = {
 local _config = {
   --["bars"] = {2,3,4,5},
   ["initialized"] = false,
-  ["store"] = nil
+  ["store"] = nil,
 };
 
 function println(...)
@@ -75,16 +77,31 @@ function LPA:saveState()
         ["extraId"] = extraId
       };
 
-      local spellName = "";
-      if ( type == "spell" ) then
-        local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(id);
-        spellName = name;
-      end
-
       -- println(actionId, type, id, spellName);
       store[actionId] = entry;
     end
   end);
+
+  print("state saved");
+end
+
+function LPA:_pickupFlyout(flyoutId)
+  for book = 1, MAX_SKILLLINE_TABS do
+    local _, _, offset, numSpells, _, offSpecId = GetSpellTabInfo(book);
+    for i = 1, numSpells do
+      if ( offSpecId == 0 ) then
+        local index = offset + i;
+
+        local type, spellId = GetSpellBookItemInfo(index, BOOKTYPE_SPELL);
+        if ( type == "FLYOUT" and flyoutId == spellId ) then
+          PickupSpellBookItem(index, BOOKTYPE_SPELL);
+          return true;
+        end
+      end
+    end
+  end
+
+  return false;
 end
 
 function LPA:restoreState()
@@ -116,7 +133,7 @@ function LPA:restoreState()
 
   -- Restore old sound setting
   SetCVar("Sound_EnableAllSound", soundToggle)
-  _config.store = nil
+  --_config.store = nil
 end
 
 function LPA:_updateSpellCache()
@@ -137,7 +154,11 @@ function LPA:_restore(actionId, action, cache)
 
   if ( action.type == "spell" or action.type == "flyout" or action.type == "companion" ) then
     -- Spell, Flyout
-    PickupSpell(action.id);
+    if ( action.type ~= "flyout" ) then
+      PickupSpell(action.id);
+    else
+      self:_pickupFlyout(action.id);
+    end
     PlaceAction(actionId);
 
   elseif ( action.type == "summonmount" ) then
