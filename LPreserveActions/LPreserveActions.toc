@@ -1,6 +1,6 @@
 ## Interface: 70000
 ## Title: LPreserveActions
 ## Author: Lethallic
-## Version: 0.2
+## Version: 0.3
 
 main.lua

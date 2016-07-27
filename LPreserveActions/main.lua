@@ -82,7 +82,6 @@ function LPA:saveState()
     end
   end);
 
-  print("state saved");
 end
 
 function LPA:_pickupFlyout(flyoutId)
@@ -133,7 +132,7 @@ function LPA:restoreState()
 
   -- Restore old sound setting
   SetCVar("Sound_EnableAllSound", soundToggle)
-  --_config.store = nil
+  _config.store = nil
 end
 
 function LPA:_updateSpellCache()
