@@ -108,6 +108,7 @@ function LPA:restoreState()
 
   -- Init
   ClearCursor();
+  self:_updateSpellCache();
 
   -- Disable Sound
   local soundToggle = GetCVar("Sound_EnableAllSound")
